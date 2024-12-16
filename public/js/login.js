@@ -29,8 +29,12 @@ async function HandleLogin(event) {
 
     const resultado = (peticion.ok) ? await peticion.json() : null;
 
-    if (resultado.status !== "OK") ShowError(resultado.error);
+    if (resultado.status !== "OK") {
+        ShowError(resultado.error);
+        return;
+    };
 
+    // redirigimos si salio bien
     window.location = "/panel";
 }
 
