@@ -1,0 +1,4 @@
+node_modules/
+vault
+.env
+db/db.json
