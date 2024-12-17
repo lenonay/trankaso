@@ -10,7 +10,25 @@ const domain = window.location;
 //// EVENTOS
 login_btn.addEventListener("click", HandleLogin);
 
+$user.addEventListener("keydown", NextInput);
+
+$passwd.addEventListener("keydown", SendForm);
+
 //// FUNCIONES
+function NextInput(event){
+    // Si se presiona enter pasamos al campo de contraseña
+    if(event.key === 'Enter'){
+        $passwd.focus();
+    }
+}
+
+function SendForm(event){
+    // Si se presiona enter enviamos el form
+    if(event.key === 'Enter'){
+        login_btn.click();
+    }
+}
+
 async function HandleLogin(event) {
     // Creamos el JSON
     const body = {
