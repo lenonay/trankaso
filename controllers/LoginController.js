@@ -40,8 +40,15 @@ export class LoginController {
             {
                 maxAge: 1000 * 60 * 60 * 6,
                 sameSite: "strict",
-                httponly: true
+                httpOnly: true
             }
-        ).json({status: "OK"});
+        ).json({ status: "OK" });
+    }
+
+    static Logoff(req, res) {
+        res.clearCookie("token", {
+            sameSite: "strict",
+            httpOnly: true
+        }).json({ status: "OK" });
     }
 }
