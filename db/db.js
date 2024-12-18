@@ -5,7 +5,7 @@ import { JSONFilePreset } from "lowdb/node";
 
 import { DEF_USER, SALT } from "../config.js";
 
-const tables = ["users"];
+const tables = ["users", "games"];
 
 export async function InitDB() {
     // Iniciamos la base de datos

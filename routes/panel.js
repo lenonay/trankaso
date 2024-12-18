@@ -1,5 +1,7 @@
 import { Router } from "express";
 
+import { GamesController } from "../controllers/GamesController.js";
+
 export const PanelRouter = Router();
 
 PanelRouter.get("/", (req, res) => {
@@ -10,3 +12,5 @@ PanelRouter.get("/", (req, res) => {
 
     res.sendFile("panel.html", { root: "./views" });
 });
+
+PanelRouter.get("/games", GamesController.GetNames);
