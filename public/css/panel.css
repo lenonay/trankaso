@@ -112,9 +112,20 @@ main {
 .display {
     position: fixed;
     z-index: 10;
-    top: 200px;
+    top: 300px;
     left: 50%;
     transform: translate(-50%, -50%);
+
+    .error_display p {
+        font-size: 16px;
+        font-weight: 600;
+
+        &::before {
+            content: "[!]";
+            letter-spacing: 1px;
+            color: #5b1c1c;
+        }
+    }
 }
 
 .display.upload {
@@ -156,10 +167,27 @@ main {
                     display: none;
                 }
 
+                & input {
+                    outline: none;
+                    background: none;
+                    font-size: 18px;
+                    border: none;
+                    border-bottom: 1.5px solid var(--color3);
+                    padding: 2px;
+                    caret-color: var(--color3);
+                    color: aliceblue;
+                    font-weight: 550;
+                }
+
                 & select {
                     width: 150px;
                     text-align: center;
                     font-weight: 600;
+                    font-size: 18px;
+
+                    & option {
+                        font-size: 16px;
+                    }
                 }
             }
 

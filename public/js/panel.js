@@ -39,6 +39,7 @@ async function HandleUpload(event) {
     // 2.2 Rellenar el display con los elementos
     const html = `
         <h2>Subida de clips y capturas</h2>
+        <div class="error_display"></div>
         <div class="formulario">
             <div class="upload_form">
                 <label for="game">
@@ -53,7 +54,7 @@ async function HandleUpload(event) {
                         ${juegos}
                     </select>
                 </label>
-                <label for="game_name" class="hidden">
+                <label for="game_name" class="game_name hidden">
                     <p>Escriba el nombre del juego que desea añadir</p>
                     <input type="text" name="game_name" id="game_name_inp"/>
                 </label>
@@ -84,11 +85,61 @@ async function HandleUpload(event) {
     const drop_area = display.querySelector(".drop_area");
     // 3. Escuchar eventos
     $game.addEventListener("change", ToggleCustomGame);
+    confirm_btn.addEventListener("click", ConfirmGameName)
     // 4. Enviar peticion de subida    
 }
 
+async function ConfirmGameName(event) {
+    // 1. Verificar si hay que crear el nombre del juego
+    const $game = document.querySelector("#game_inp");
+    const $game_name = document.querySelector("#game_name_inp");
+
+    // 1.1 Si deja el nombre vacío mostrar un error
+    if ($game.value == "otro" && !$game_name.value) {
+        ShowDisplayErrors("Ingrese un nombre válido");
+        return;
+    }
+    // 1.2 2Mandar la peticion post para crearlo
+    if ($game.value == "otro") {
+        // Mandamos la petición para crear el recurso
+        const create_pet = await fetch(`${domain}/games`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name: $game_name.value })
+        });
+
+        // Recuperamos la respuesta
+        const create_res = (create_pet.ok) ? await create_pet.json() : null;
+
+        // Si hubo un error lo mostramos
+        if(create_res.status !== "OK"){
+            ShowDisplayErrors(create_res.error);
+            return;
+        }
+    }
+    // 2. Validar si el nombre se puede usar
+    // 3. Mostrar El menu de subida o un error si precisa.
+}
+
 function ToggleCustomGame(event) {
-    console.log(event.target.value);
+    const game_name = document.querySelector(".game_name");
+    const { value } = event.target;
+
+    if (value === "otro") {
+        game_name.classList.remove("hidden");
+    } else {
+        game_name.classList.add("hidden");
+    }
+}
+
+function ShowDisplayErrors(msg) {
+    // Recuperamos el display de errores
+    const error_display = document.querySelector(".error_display");
+
+    // Mostramos el error
+    error_display.innerHTML = `<p>${msg}</p>`;
 }
 
 function CreateDisplay(customClass) {

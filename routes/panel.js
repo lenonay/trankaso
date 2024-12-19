@@ -14,3 +14,5 @@ PanelRouter.get("/", (req, res) => {
 });
 
 PanelRouter.get("/games", GamesController.GetNames);
+
+PanelRouter.post("/games", GamesController.CreateGame);
