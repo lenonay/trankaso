@@ -1,3 +1,4 @@
+import fs from "node:fs"
 import { InitDB } from "./db/db.js";
 
 process.loadEnvFile("./.env");
@@ -7,7 +8,14 @@ export const {
     INT = "0.0.0.0",
     JWT_PASS,
     DEF_USER,
-    SALT
+    SALT,
+    TMP_DIR
 } = process.env
+
+export const allowed_ext = [
+    "jpg", "png", "jpeg",
+    "gif", "mov", "mp4",
+    "webp", "webm"
+]
 
 InitDB();

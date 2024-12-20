@@ -24,7 +24,7 @@ async function Logoff() {
     if (resultado.status == "OK") window.location.reload();
 }
 
-async function HandleUpload(event) {
+async function HandleUpload() {
     // 1. Crear display y fondo y meterle la clase custom
     CreateDisplay("upload")
     // 2.1 Pedimos la lista de juegos al servidor
@@ -64,13 +64,14 @@ async function HandleUpload(event) {
             </div>
             <div class="upload_zone hidden">
                 <div class="drop_area">
-                    <h3>Arrestre los archivos aqui</h3>
+                    <h3>Arrastre los archivos aqui</h3>
                     <span>O</span>
                     <button type="button" class="files_btn">
                         <span>Subir archivos</span>
                     </button>
-                    <input type="file" name="files_inp" multiple hidden/>
+                    <input type="file" id="files_inp" name="files_inp" multiple hidden/>
                 </div>
+                <div class="uploaded_files"></div>
             </div>
         </div>
     `;
@@ -81,15 +82,131 @@ async function HandleUpload(event) {
     const $files = display.querySelector("#files_inp");
     const confirm_btn = display.querySelector(".confirm_btn");
     const files_btn = display.querySelector(".files_btn");
-    const upload_zone = display.querySelector(".upload_zone");
     const drop_area = display.querySelector(".drop_area");
     // 3. Escuchar eventos
     $game.addEventListener("change", ToggleCustomGame);
-    confirm_btn.addEventListener("click", ConfirmGameName)
-    // 4. Enviar peticion de subida    
+    confirm_btn.addEventListener("click", ConfirmGameName);
+    files_btn.addEventListener("click", () => $files.click());
+    $files.addEventListener("change", HandleFilesInput);
+    // Drag and Drop
+    drop_area.addEventListener("dragover", HandleDragOver);
+    drop_area.addEventListener("dragleave", HandleDragLeave);
+    drop_area.addEventListener("drop", HandleDrop);
+    // 4. Enviar peticion de subida
 }
 
-async function ConfirmGameName(event) {
+function HandleDragOver(event) {
+    event.preventDefault();
+
+    const { currentTarget } = event
+
+    // Añadimos la clase activa
+    currentTarget.classList.add("active");
+
+    // Cambiamos el texto
+    currentTarget.querySelector("h3").textContent = "Suelte los archivos aquí";
+}
+
+function HandleDragLeave(event) {
+    event.preventDefault();
+
+    const { currentTarget } = event
+
+    // Añadimos la clase activa
+    currentTarget.classList.remove("active");
+
+    // Cambiamos el texto
+    currentTarget.querySelector("h3").textContent = "Arrastre los archivos aquí";
+}
+
+function HandleDrop(event) {
+    event.preventDefault();
+
+    // Quitamos el texto
+    const { currentTarget } = event;
+    // Añadimos la clase activa
+    currentTarget.classList.remove("active");
+    // Cambiamos el texto
+    currentTarget.querySelector("h3").textContent = "Arrastre los archivos aquí";
+
+    const { files } = event.dataTransfer;
+
+    for (const file of files) {
+        ProcessFile(file)
+    }
+}
+
+function HandleFilesInput(event) {
+    const { files } = event.target;
+
+    for(const file of files){
+        ProcessFile(file);
+    }
+}
+
+async function ProcessFile(_file) {
+    // Validar el tipo mime
+    const { type, name } = _file;
+    // Extensiones validas
+    const validTypes = ["image", "video"];
+
+    // Obtenemos el tipo principal
+    const mainType = type.split("/")[0];
+
+    // Si no es valido mostramos error y salimos
+    if (!validTypes.includes(mainType)) {
+        ShowDisplayErrors("Solo se permite videos o imágenes");
+        return;
+    }
+    // Recuperamos la zona de ficheros subidos
+    const zone = document.querySelector(".uploaded_files");
+
+    // Activamos la zona de ficheros subidos
+    zone.classList.add("active");
+
+    // Creamos la card
+    const card = document.createElement("div");
+
+    // Le asignamos la clase
+    card.className = "file_card";
+
+    // Creamos el contenido de la carta
+    card.innerHTML = `
+        <span>${name}</span>
+        <div class="loader"></div>
+    `;
+
+    // Añadimos el html
+    zone.append(card);
+
+    const form = new FormData;
+
+    form.append("file", _file);
+
+    // Subimos el archivo
+    const upload_pet = await fetch(`${domain}/games/files`, {
+        method: "POST",
+        body: form
+    });
+
+    const upload_res = (upload_pet.ok) ? await upload_pet.json() : null;
+
+    const loader = card.querySelector(".loader");
+
+    if (upload_res.status !== "OK") {
+        // Marcamos el archivo como fallido
+        loader.className = "xmark";
+        // En caso de que no haya error ponemos uno genérico
+        let error = upload_res.error ?? "Error al subir el archivo";
+        // Mostramos el error y salimos
+        ShowDisplayErrors(error);
+        return;
+    }
+
+    loader.className = "check";
+}
+
+async function ConfirmGameName() {
     // 1. Verificar si hay que crear el nombre del juego
     const $game = document.querySelector("#game_inp");
     const $game_name = document.querySelector("#game_name_inp");
@@ -114,13 +231,41 @@ async function ConfirmGameName(event) {
         const create_res = (create_pet.ok) ? await create_pet.json() : null;
 
         // Si hubo un error lo mostramos
-        if(create_res.status !== "OK"){
+        if (create_res.status !== "OK") {
             ShowDisplayErrors(create_res.error);
             return;
         }
+
+        // Creamos una opción con ese nombre
+        const option = document.createElement("option");
+        option.value = $game_name.value;
+        option.textContent = $game_name.value;
+
+        // Lo añadimos al menu
+        $game.append(option);
+
+        // Lo seleccionamos
+        $game.value = $game_name.value;
     }
     // 2. Validar si el nombre se puede usar
+    const validar_pet = await fetch(`${domain}/games`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name: $game.value })
+    })
+
+    const validar_res = (validar_pet.ok) ? await validar_pet.json() : null;
+
     // 3. Mostrar El menu de subida o un error si precisa.
+    if (validar_res.status !== "OK") {
+        ShowDisplayErrors(validar_res.error);
+        return
+    }
+
+    const upload_zone = document.querySelector(".upload_zone");
+    upload_zone.classList.remove("hidden");
 }
 
 function ToggleCustomGame(event) {

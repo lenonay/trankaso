@@ -1,6 +1,7 @@
 import { Router } from "express";
-
-import { GamesController } from "../controllers/GamesController.js";
+import { GamesRouter } from "./games.js";
+import { FilesRouter } from "./files.js";
+import { authorize } from "../middleware/authorize.js";
 
 export const PanelRouter = Router();
 
@@ -9,10 +10,13 @@ PanelRouter.get("/", (req, res) => {
         res.redirect("../");
         return;
     }
-
+    
     res.sendFile("panel.html", { root: "./views" });
 });
 
-PanelRouter.get("/games", GamesController.GetNames);
+// Evitar accesos sin sesion
+PanelRouter.use(authorize);
 
-PanelRouter.post("/games", GamesController.CreateGame);
+PanelRouter.use("/games", GamesRouter);
+
+PanelRouter.use("/games/files", FilesRouter);

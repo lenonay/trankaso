@@ -1,4 +1,5 @@
 node_modules/
 vault
+vault/
 .env
 db/db.json
