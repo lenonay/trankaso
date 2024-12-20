@@ -1,4 +1,4 @@
-import { Router } from "express";
+import e, { Router } from "express";
 import multer from "multer";
 import path from "node:path"
 
@@ -10,6 +10,9 @@ export const FilesRouter = Router();
 const storage = multer.diskStorage({
     destination: TMP_DIR,
     filename: (req, file, cb) => {
+
+        file.originalname = file.originalname.replaceAll(" ","_");
+
         cb(null, file.originalname);
     }
 })
