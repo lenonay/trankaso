@@ -9,6 +9,10 @@ export class FilesController {
             res.json({ status: "error" });
             return;
         }
+        // Cargamos los datos de la DB
+        const db = await JSONFilePreset("./db/db.json", { games: [] });
+
+        // Sacamos todas las variables necesarias
         const { path, mimetype, size, originalname } = req.file;
         const { workdir, thumbpath, gamename, user } = req.session
 
@@ -51,12 +55,26 @@ export class FilesController {
             return thumbnail_path;
         }
 
+        // Sacamos el juego que estamos usando ahora
+        const current_gameDB = db.data.games.find(entry => entry.name == gamename);
+        // Buscamos una entrada que tenga el mismo nombre que lo que queremos subir
+        const exists = current_gameDB.files.find(entry => entry.name == originalname);
+
+        // Si existe enviamos error y salimos
+        if(exists){
+            res.json({status: "error", error: "El archivo ya existe"});
+            return;
+        }
+
+
         // 1. Crear el thumbnail y llevarlo a la ruta actual de trabajo
         let thumbnail_path = "";
 
+        // Si es video creamos el thumbnail de un frame de un video
         if (mimetype.includes("video")) {
             thumbnail_path = CreateVideoThumbnail()
         } else {
+            // Si no sencillamente creamos el thumbnail de un imagen
             thumbnail_path = CreateImageThumbnail();
         }
 
@@ -70,13 +88,11 @@ export class FilesController {
             name: originalname,
             path: workdir + originalname,
             thumbnail: thumbnail_path,
-            size: Math.round((size / 1024 / 1024), 2),
+            size: (size / 1024 / 1024).toFixed(2),
             type: mimetype,
             author: user,
             date: new Date().toISOString()
         }
-
-        const db = await JSONFilePreset("./db/db.json", { games: [] });
 
         // Intentamos guardar el fichero en la DB
         try {
