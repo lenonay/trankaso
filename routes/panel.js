@@ -19,4 +19,4 @@ PanelRouter.use(authorize);
 
 PanelRouter.use("/games", GamesRouter);
 
-PanelRouter.use("/games/files", FilesRouter);
+PanelRouter.use("/files", FilesRouter);

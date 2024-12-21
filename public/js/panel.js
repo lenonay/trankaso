@@ -136,11 +136,11 @@ function HandleDrop(event) {
     }
 }
 
-function HandleFilesInput(event) {
+async function HandleFilesInput(event) {
     const { files } = event.target;
 
-    for(const file of files){
-        ProcessFile(file);
+    for (const file of files) {
+        await ProcessFile(file);
     }
 }
 
@@ -184,7 +184,7 @@ async function ProcessFile(_file) {
     form.append("file", _file);
 
     // Subimos el archivo
-    const upload_pet = await fetch(`${domain}/games/files`, {
+    const upload_pet = await fetch(`${domain}/files`, {
         method: "POST",
         body: form
     });
@@ -264,6 +264,9 @@ async function ConfirmGameName() {
         return
     }
 
+    const game_name = document.querySelector(".game_name");
+    game_name.classList.add("hidden");
+
     const upload_zone = document.querySelector(".upload_zone");
     upload_zone.classList.remove("hidden");
 }
@@ -277,6 +280,15 @@ function ToggleCustomGame(event) {
     } else {
         game_name.classList.add("hidden");
     }
+
+    // Borramos los archivos subidos y ocultamos los archivos
+    const uploaded_files = document.querySelector(".uploaded_files");
+    uploaded_files.innerHTML = "";
+    uploaded_files.classList.remove("active");
+
+    // Ocultamos la zona de subidas
+    const upload_zone = document.querySelector(".upload_zone");
+    upload_zone.classList.add("hidden");
 }
 
 function ShowDisplayErrors(msg) {

@@ -63,7 +63,7 @@ export class FilesController {
         // 2. Mover el fichero a su destino
         try {
             fs.renameSync(path, workdir + originalname);
-        } catch {}
+        } catch { }
 
         // 3. Crear el objeto para la DB y meterlo
         const new_file = {
@@ -78,13 +78,26 @@ export class FilesController {
 
         const db = await JSONFilePreset("./db/db.json", { games: [] });
 
-        await db.update(({ games }) => {
-            // Recuperamos el juego actuak
-            const juego = games.find(entry => entry.name == gamename);
-            // Metemos todos los archivos
-            juego.files.push(new_file);
-        })
+        // Intentamos guardar el fichero en la DB
+        try {
+            await db.update(({ games }) => {
+                // Recuperamos el juego actuak
+                const juego = games.find(entry => entry.name == gamename);
+                // Metemos todos los archivos
+                juego.files.push(new_file);
+            })
 
-        res.json({ status: "OK" });
+            res.json({ status: "OK" });
+
+        } catch {
+            // Si hay un error borramos los ficheros y enviamos error
+            try {
+                fs.unlinkSync(thumbnail_path);
+
+                fs.unlinkSync(workdir + originalname);
+            } catch { }
+
+            res.json({ status: "error", error: "No se pudo guardar la imagen" });
+        }
     }
 }
