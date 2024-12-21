@@ -61,11 +61,10 @@ export class FilesController {
         const exists = current_gameDB.files.find(entry => entry.name == originalname);
 
         // Si existe enviamos error y salimos
-        if(exists){
-            res.json({status: "error", error: "El archivo ya existe"});
+        if (exists) {
+            res.json({ status: "error", error: "El archivo ya existe" });
             return;
         }
-
 
         // 1. Crear el thumbnail y llevarlo a la ruta actual de trabajo
         let thumbnail_path = "";
@@ -86,6 +85,7 @@ export class FilesController {
         // 3. Crear el objeto para la DB y meterlo
         const new_file = {
             name: originalname,
+            game: gamename,
             path: workdir + originalname,
             thumbnail: thumbnail_path,
             size: (size / 1024 / 1024).toFixed(2),
@@ -115,5 +115,48 @@ export class FilesController {
 
             res.json({ status: "error", error: "No se pudo guardar la imagen" });
         }
+    }
+
+    static async SendFilesData(req, res) {
+        // Cargamos la DB
+        const db = await JSONFilePreset("./db/db.json", { games: [] });
+        // Sacamos los filtros
+        const { games, author, date, type } = req.query;
+
+        // Inicalizamos el array de ficheros
+        let files = [];
+
+        // Iteramos por cada juego y añadimos sus ficheros al array
+        for (const game of db.data.games) {
+            files = files.concat(game.files);
+        }
+
+        // Si hay juegos filtramos por ellos
+        if (games) {
+            // Separamos los juegos haciendo un array
+            let games_ar = games.split(";");
+
+            // Filtramos
+            files = files.filter(entry => games_ar.includes(entry.game));
+        }
+
+        // Filtramos por autor
+        if (author) {
+            files = files.filter(entry => entry.author == author);
+        }
+
+        // Filtramos por fecha formato YYYY-mm-dd
+        if (date) {
+            files = files.filter(entry => entry.date.includes(date));
+        }
+
+        // Filtramos por tipo de medio
+        if (type) {
+            files = files.filter(entry => entry.type.includes(type));
+        }
+
+        // const vacio = (Object.keys(req.query).length == 0) ? true : false
+
+        res.json({ n: files.length, files: files });
     }
 }

@@ -1,4 +1,4 @@
-import e, { Router } from "express";
+import { Router } from "express";
 import multer from "multer";
 import path from "node:path"
 
@@ -32,6 +32,8 @@ const fileFilter = (req, file, cb) => {
 const uploader = multer({ storage, fileFilter });
 
 FilesRouter.post("/", uploader.single("file"), FilesController.Upload)
+
+FilesRouter.get("/", FilesController.SendFilesData)
 
 // Manejo de errores de multer
 FilesRouter.use((err, req, res, next) => {

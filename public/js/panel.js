@@ -273,7 +273,11 @@ async function ConfirmGameName() {
 
 function ToggleCustomGame(event) {
     const game_name = document.querySelector(".game_name");
+    const game_name_inp = document.querySelector("#game_name_inp");
     const { value } = event.target;
+
+    // Reiniciamos el valor del selector
+    game_name_inp.value = ""; 
 
     if (value === "otro") {
         game_name.classList.remove("hidden");

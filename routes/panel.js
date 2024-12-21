@@ -15,7 +15,7 @@ PanelRouter.get("/", (req, res) => {
 });
 
 // Evitar accesos sin sesion
-PanelRouter.use(authorize);
+// PanelRouter.use(authorize);
 
 PanelRouter.use("/games", GamesRouter);
 
