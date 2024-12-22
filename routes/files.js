@@ -35,6 +35,10 @@ FilesRouter.post("/", uploader.single("file"), FilesController.Upload)
 
 FilesRouter.get("/", FilesController.SendFilesData)
 
+FilesRouter.delete("/single", FilesController.DeleteSingle);
+
+FilesRouter.get("/filter", FilesController.SendFilesFilters);
+
 // Manejo de errores de multer
 FilesRouter.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {

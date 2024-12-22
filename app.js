@@ -5,6 +5,7 @@ import { PORT, INT } from "./config.js";
 import { LoginRouter } from "./routes/login.js";
 import { PanelRouter } from "./routes/panel.js";
 import { token } from "./middleware/jwt.js";
+import { VaultRouter } from "./routes/vault.js";
 
 const app = e();
 
@@ -30,6 +31,8 @@ app.get("/", (req, res) => {
 app.use("/login", LoginRouter)
 
 app.use("/panel", PanelRouter);
+
+app.use("/vault", VaultRouter);
 
 app.listen(PORT, INT, () => {
     console.log("Server is listening on:", INT, PORT);

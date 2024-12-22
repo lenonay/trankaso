@@ -140,14 +140,14 @@ export class FilesController {
             files = files.filter(entry => games_ar.includes(entry.game));
         }
 
-        // Filtramos por autor
-        if (author) {
-            files = files.filter(entry => entry.author == author);
-        }
-
         // Filtramos por fecha formato YYYY-mm-dd
         if (date) {
             files = files.filter(entry => entry.date.includes(date));
+        }
+
+        // Filtramos por autor
+        if (author) {
+            files = files.filter(entry => entry.author == author);
         }
 
         // Filtramos por tipo de medio
@@ -155,8 +155,21 @@ export class FilesController {
             files = files.filter(entry => entry.type.includes(type));
         }
 
-        // const vacio = (Object.keys(req.query).length == 0) ? true : false
-
         res.json({ n: files.length, files: files });
+    }
+
+    static async SendFilesFilters(req, res) {
+        const db = await JSONFilePreset("./db/db.json", { games: [] });
+
+        const users = db.data.users.map(entry => entry.user);
+
+        const games = db.data.games.map(entry => entry.name);
+
+        res.json({ users, games });
+    }
+
+    static async DeleteSingle(req, res) {
+        
+        res.json(req.body)
     }
 }
