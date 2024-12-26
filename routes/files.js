@@ -35,7 +35,7 @@ FilesRouter.post("/", uploader.single("file"), FilesController.Upload)
 
 FilesRouter.get("/", FilesController.SendFilesData)
 
-FilesRouter.delete("/single", FilesController.DeleteSingle);
+FilesRouter.delete("/", FilesController.DeleteSingle);
 
 FilesRouter.get("/filter", FilesController.SendFilesFilters);
 

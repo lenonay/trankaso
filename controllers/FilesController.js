@@ -169,7 +169,38 @@ export class FilesController {
     }
 
     static async DeleteSingle(req, res) {
-        
-        res.json(req.body)
+        const { game, name } = req.body;
+
+        // Cargamos la base de datos
+        const db = await JSONFilePreset("./db/db.json", { games: [] });
+
+        // Sacamos el juego que estamos buscando
+        const gameDB = db.data.games.find(entry => entry.name == game);
+
+        // Sacamos el fichero si el thumbnail incluye el nombre
+        const fileDB = gameDB.files.find(entry => entry.thumbnail.includes(name));
+
+        // Borramos tanto el archivo original como el thumbnail
+        try {
+            // Borramos el original
+            fs.unlinkSync(fileDB.path);
+
+            // Borramos el thumbnail
+            fs.unlinkSync(fileDB.thumbnail);
+
+            // Borrar registro de la DB
+            // CODIGO
+            gameDB.files = gameDB.files.filter(entry => entry.thumbnail !== fileDB.thumbnail);
+
+            // Guardamos los cambios
+
+            await db.write();
+
+            // Enviamos estado existoso
+            res.json({ status: "OK" });
+        } catch {
+            // Si falla el borrado marcamos que no se pudo eliminar el archivo.
+            res.json({ status: "error", error: "No se pudo eliminar el archivo" });
+        }
     }
 }
