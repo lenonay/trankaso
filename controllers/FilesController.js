@@ -20,7 +20,7 @@ export class FilesController {
 
             const thumbnail_path = thumbpath + originalname;
 
-            const comando = `convert -thumbnail 150 ${path} ${thumbnail_path}`
+            const comando = `convert -thumbnail 150 '${path}' '${thumbnail_path}'`
             // Ejecutamos el comando
             execSync(comando);
 
@@ -36,13 +36,13 @@ export class FilesController {
             const thumbnail_path = thumbpath + file_pic;
 
             // Crear la miniatura
-            const miniatura_commando = `ffmpeg -loglevel quiet -i ${path} -frames:v 1 ${tmp_png_file}`;
+            const miniatura_commando = `ffmpeg -loglevel quiet -i '${path}' -frames:v 1 '${tmp_png_file}'`;
             try {
                 execSync(miniatura_commando);
             } catch { };
 
             // Crear thumb de la miniatura
-            const thub_comando = `convert -thumbnail 150 ${tmp_png_file} ${thumbnail_path}`;
+            const thub_comando = `convert -thumbnail 150 '${tmp_png_file}' '${thumbnail_path}'`;
             try {
                 execSync(thub_comando);
             } catch { }
@@ -140,21 +140,27 @@ export class FilesController {
             files = files.filter(entry => games_ar.includes(entry.game));
         }
 
-        // Filtramos por fecha formato YYYY-mm-dd
-        if (date) {
-            files = files.filter(entry => entry.date.includes(date));
-        }
-
         // Filtramos por autor
         if (author) {
-            files = files.filter(entry => entry.author == author);
+            // Sacamos el array
+            let author_ar = author.split(";");
+
+            // Filtramos si contiene el nombre
+            files = files.filter(entry => author_ar.includes(entry.author));
         }
 
         // Filtramos por tipo de medio
         if (type) {
-            files = files.filter(entry => entry.type.includes(type));
-        }
+            let type_ar = type.split(";");
 
+            files = files.filter(entry => type_ar.includes(entry.type.split("/")[0]));
+        }
+        
+        // Filtramos por fecha formato YYYY-mm-dd
+        if (date) {
+            files = files.filter(entry => entry.date.includes(date));
+        }
+        
         res.json({ n: files.length, files: files });
     }
 
