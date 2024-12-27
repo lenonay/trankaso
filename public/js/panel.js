@@ -22,6 +22,7 @@ const svgs = {
 logoff_btn.addEventListener("click", Logoff);
 upload_btn.addEventListener("click", HandleUpload);
 storage_btn.addEventListener("click", HandleStorage);
+user_btn.addEventListener("click", HandleUser);
 
 ///// FUNCIONES
 async function Logoff() {
@@ -30,6 +31,10 @@ async function Logoff() {
     const resultado = (peticion.ok) ? await peticion.json() : null
 
     if (resultado.status == "OK") window.location.reload();
+}
+
+function HandleUser() {
+    
 }
 
 async function HandleStorage() {
