@@ -34,12 +34,294 @@ async function Logoff() {
 }
 
 function HandleUser() {
-    
+    // Vaciamos el contenido del main y le asignamos la clase correcta
+    main.innerHTML = "";
+    main.classList.add("users");
+
+    LoadUsers();
+
+}
+
+function LoadUsers() {
+    // Creamos los contenedores
+    const menu = document.createElement("div");
+    menu.className = "menu_div";
+
+    const usuarios = document.createElement("div");
+    usuarios.className = "usuarios_div";
+
+    main.append(menu);
+    main.append(usuarios);
+
+    menu.innerHTML = `
+        <button type="button" class="change_btn">
+            <span>Cambiar contraseña</span>
+        </button>
+        <button type="button" class="create_btn">
+            <span>Crear un usuario</span>
+        </button>
+    `
+
+    const change_btn = menu.querySelector(".change_btn");
+
+    change_btn.addEventListener("click", ChangeOwnPass);
+
+    const create_btn = menu.querySelector(".create_btn");
+
+    create_btn.addEventListener("click", CreateNewUser);
+}
+
+function CreateNewUser() {
+    CreateDisplay("create_user");
+
+    const display = document.querySelector(".display.create_user");
+
+    display.innerHTML = `
+        <h3>Crear un nuevo usuario</h3>
+        <div class="formulario">
+            <input type="text" id="username" placeholder="Nombre de usuario"/>
+            <button type="button" class="create_btn">
+                <span>Crear usuario</span>
+            </button>
+        </div>
+        <div class="tmp_zone">
+            <div class="error_display"></div>
+            <h4>Contraseña temporal</h4>
+            <span class="passwd_box">Nada aún</span>
+        </div>
+    `;
+
+    const create_btn = display.querySelector(".create_btn");
+    create_btn.addEventListener("click", CheckNewUser);
+}
+
+function CheckNewUser(event) {
+    // Recueramos el input
+    const input = document.querySelector("#username");
+
+    // Sacamos el valor 
+    const { value } = input;
+
+    // Si el usuario es menor a 4 error 
+    if (value.length < 4) {
+        MarkInputError(input);
+        ShowDisplayErrors("El usuario debe ser mayor a 4 caracteres");
+        return;
+    }
+
+    SendNewUser(value);
+}
+
+async function SendNewUser(username) {
+    const peticion = await fetch(`${domain}/users`, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify({ username })
+    });
+
+    const resultado = (peticion.ok) ? await peticion.json() : null
+
+    if (resultado.status !== "OK") {
+        ShowDisplayErrors(resultado.error);
+        return;
+    }
+
+    // Mostramos la contraseña
+    UpdateTmpPasswd(resultado.tmp_passwd);
+
+    // Borramos el evento de crear un usuario
+    const create_btn = display.querySelector(".formulario .create_btn");
+    create_btn.removeEventListener("click", CheckNewUser);
+}
+
+function UpdateTmpPasswd(passwd) {
+    // Recuperamos el elemento
+    const span = document.querySelector(".passwd_box");
+
+    // Metemos la contraseña por defecto
+    span.textContent = passwd;
+
+    span.classList.add("active");
+}
+
+function ChangeOwnPass(event) {
+    // Creamos el display
+    CreateDisplay("change_pass");
+    const display = document.querySelector(".display.change_pass");
+    // Metemos el html
+    display.innerHTML = `
+        <h3>Crear una contraseña nueva</h3>
+        <div class="error_display"></div>
+        <div class="formulario">
+            <input type="text" id="old_passwd" placeholder="Contraseña Actual"/>
+            <input type="text" id="new_passwd" placeholder="Contraseña Nueva"/>
+            <input type="text" id="new_passwd_conf" placeholder="Confirme la contraseña"/>
+        </div>
+        <div class="validaciones">
+            <span class="val1">Contener un número</span>
+            <span class="val2">Contener un símbolo especial</span>
+            <span class="val3">Longitud mayor a 6 carácteres</span>
+            <span class="val4">Contener una letra mínuscula y máyuscula</span>
+        </div>
+        <button type="button" class="change_passwd_btn">
+            <span>Cambiar contraseña</span>
+        </button>
+    `;
+    // Recuperamos los inputs
+    const new_passwd = display.querySelector("#new_passwd");
+    // Cada que se escriba vamos a ir validando
+    new_passwd.addEventListener("keyup", ValidatePasswd);
+
+    // Recuperamos el boton
+    const change_btn = display.querySelector(".change_passwd_btn");
+    // Asignamos el evento para revisar que todo esta OK
+    change_btn.addEventListener("click", CheckPasswd);
+}
+
+function CheckPasswd(event) {
+    // Recuperamos todos los inputs
+    const old_passwd = document.querySelector("#old_passwd");
+    const new_passwd = document.querySelector("#new_passwd");
+    const new_passwd_conf = document.querySelector("#new_passwd_conf");
+
+    // Si la contraseña actual esta vacia
+    if (old_passwd.value.length == 0) {
+        MarkInputError(old_passwd);
+        ShowDisplayErrors("Introduzca su contraseña actual");
+        return;
+    }
+    // Si no cumple los requisitos
+    if (!ValidatePasswd()) {
+        MarkInputError(new_passwd);
+        ShowDisplayErrors("La contraseña no cumple los requisitos")
+        return;
+    }
+    // Si las contraseñas no coinciden
+    if (new_passwd.value !== new_passwd_conf.value) {
+        MarkInputError(new_passwd_conf);
+        ShowDisplayErrors("Las contraseñas no coinciden");
+        return;
+    }
+    // Limpiamos el error previo
+    document.querySelector(".error_display").innerHTML = "";
+
+    // Enviamos la peticion para cambiar la contraseña
+    SendNewOwnPasswd(new_passwd.value, old_passwd.value);
+}
+
+async function SendNewOwnPasswd(new_passwd, old_passwd) {
+    // Cuerpo de la peticion
+    const data = { new_passwd, old_passwd };
+
+    const peticion = await fetch(`${domain}/users`, {
+        method: "PATCH",
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    const resultado = (peticion.ok) ? await peticion.json() : null;
+
+    if (resultado.status !== "OK") {
+        ShowDisplayErrors(resultado.error);
+        return;
+    }
+
+    CloseDisplay();
+}
+
+function MarkInputError(input) {
+    // Hacemos focus
+    input.focus();
+    // Le añadimos la clase de error
+    input.classList.add("error");
+    // Evento de una vez para cuando escriba se quite
+    input.addEventListener("keydown", () => {
+        input.classList.remove("error");
+    }, { once: true })
+}
+
+function ValidatePasswd() {
+    // Recuperamos el display
+    const display = document.querySelector(".display.change_pass");
+
+    const input = display.querySelector("#new_passwd");
+
+    const { value } = input;
+
+    // Recuperamos todos los elementos.
+    const $num = display.querySelector(".val1");
+    const $simbolo = display.querySelector(".val2");
+    const $longitud = display.querySelector(".val3");
+    const $minmayus = display.querySelector(".val4");
+
+    // Creamos las regex
+    const min = /[a-z]/;
+    const mayus = /[A-Z]/;
+    const num = /[0-9]/;
+    const simb = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/;
+
+    // Creamos el validador
+    let validos = [false, false, false, false];
+
+    // Validamos si tiene un numero
+    if (num.test(value)) {
+        $num.classList.add("check");
+        validos[0] = true
+    } else {
+        $num.classList.remove("check");
+        validos[0] = false
+    }
+    // Validamos si continen un simbolo
+    if (simb.test(value)) {
+        $simbolo.classList.add("check");
+        validos[1] = true
+    } else {
+        $simbolo.classList.remove("check");
+        validos[1] = false
+    }
+    // Validamos la longitud
+    if (value.length >= 6) {
+        $longitud.classList.add("check");
+        validos[2] = true
+    } else {
+        $longitud.classList.remove("check");
+        validos[2] = false
+    }
+    // Validamos si tiene mayuscula y minuscula
+    if (min.test(value) && mayus.test(value)) {
+        $minmayus.classList.add("check");
+        validos[3] = true
+    } else {
+        $minmayus.classList.remove("check");
+        validos[3] = false
+    }
+
+    if (validos.every(entry => entry)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+async function GetAllUsers() {
+    // Hacemos la peticion
+    const peticion = await fetch(`${domain}/users`, { method: "GET" });
+
+    // Procesamos la respuesta
+    const respuesta = (peticion.ok) ? await peticion.json() : null;
+
+    // Devolvemos el resultado
+    return respuesta;
 }
 
 async function HandleStorage() {
     // Vaciamos el contenido del main
     main.innerHTML = "";
+    main.className = "";
 
     // Creamos los elementos
     const filter_div = document.createElement("div");

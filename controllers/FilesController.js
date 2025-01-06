@@ -195,11 +195,9 @@ export class FilesController {
             fs.unlinkSync(fileDB.thumbnail);
 
             // Borrar registro de la DB
-            // CODIGO
             gameDB.files = gameDB.files.filter(entry => entry.thumbnail !== fileDB.thumbnail);
 
             // Guardamos los cambios
-
             await db.write();
 
             // Enviamos estado existoso

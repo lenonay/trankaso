@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { GamesRouter } from "./games.js";
 import { FilesRouter } from "./files.js";
+import { UsersRouter } from "./users.js";
+
 import { authorize } from "../middleware/authorize.js";
 
 export const PanelRouter = Router();
@@ -22,3 +24,5 @@ PanelRouter.use(authorize);
 PanelRouter.use("/games", GamesRouter);
 
 PanelRouter.use("/files", FilesRouter);
+
+PanelRouter.use("/users", UsersRouter);

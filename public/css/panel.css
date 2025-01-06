@@ -298,6 +298,35 @@ main {
     }
 }
 
+main.users {
+    display: grid;
+    grid-template-rows: 80px 1fr;
+    gap: 20px;
+
+    & .menu_div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+
+        button {
+            padding: 8px 12px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background: #7a7a7a;
+            transition: all 300ms ease;
+
+            &:hover {
+                background: var(--color4);
+                box-shadow: 0 0 10px 1px var(--color5);
+            }
+        }
+    }
+}
+
 .back {
     position: fixed;
     z-index: 9;
@@ -639,6 +668,206 @@ main {
             &:hover {
                 color: var(--alert1);
                 filter: drop-shadow(0 0 5px var(--alert2));
+            }
+        }
+    }
+}
+
+.display.change_pass {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 50px 20px 1fr 50px;
+    grid-template-areas:
+        "title title"
+        "error error"
+        "formulario validaciones"
+        "btn btn"
+    ;
+    gap: 15px;
+
+    background: var(--color2);
+    box-shadow: 0 0 10px 1px #00000030;
+    padding: 15px 25px;
+    border-radius: 20px;
+
+    & h3 {
+        grid-area: title;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    & .error_display {
+        grid-area: error;
+        text-align: center;
+
+        & p::before {
+            content: "[!]";
+            letter-spacing: 1px;
+            color: var(--alert1);
+        }
+    }
+
+    & .formulario {
+        grid-area: formulario;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+
+        & input {
+            border: none;
+            background: none;
+            outline: none;
+            padding: 5px 10px;
+            font-size: 18px;
+            color: aliceblue;
+            caret-color: var(--color4);
+            border-bottom: 1.5px solid var(--color4);
+            transition: all 300ms ease;
+
+            &.error {
+                caret-color: var(--alert1);
+                border-bottom: 1.5px solid var(--alert1);
+            }
+        }
+    }
+
+    & .validaciones {
+        grid-area: validaciones;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 8px;
+
+        & span {
+            font-size: 18px;
+            transition: all 300ms ease;
+
+            &.check {
+                color: aliceblue;
+                opacity: 0.4;
+            }
+        }
+    }
+
+    & .change_passwd_btn {
+        grid-area: btn;
+        justify-self: center;
+        align-self: center;
+        background: var(--color3);
+        border-radius: 8px;
+        box-shadow: 0 0 10px 1px #00000030;
+        width: fit-content;
+        font-size: 20px;
+        font-weight: 600;
+        color: black;
+        padding: 5px 12px;
+        cursor: pointer;
+        transition: all 300ms ease;
+
+        &:hover {
+            background: var(--color4);
+            box-shadow: 0 0 10px 1px var(--color5);
+        }
+    }
+}
+
+.display.create_user {
+    display: grid;
+    grid-template-areas:
+        "title title"
+        "formulario tmp"
+    ;
+    grid-template-rows: 50px 1fr;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+
+    background: var(--color2);
+    box-shadow: 0 0 10px 1px #00000030;
+    padding: 15px 25px;
+    border-radius: 20px;
+
+    & h3 {
+        grid-area: title;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    & .formulario {
+        grid-area: formulario;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+
+        & input {
+            border: none;
+            background: none;
+            outline: none;
+            padding: 5px 10px;
+            font-size: 18px;
+            color: aliceblue;
+            caret-color: var(--color4);
+            border-bottom: 1.5px solid var(--color4);
+            transition: all 300ms ease;
+
+            &.error {
+                caret-color: var(--alert1);
+                border-bottom: 1.5px solid var(--alert1);
+            }
+        }
+
+        & button {
+            background: var(--color3);
+            border-radius: 8px;
+            box-shadow: 0 0 10px 1px #00000030;
+            width: fit-content;
+            font-size: 20px;
+            font-weight: 600;
+            color: black;
+            padding: 5px 12px;
+            cursor: pointer;
+            transition: all 300ms ease;
+
+            &:hover {
+                background: var(--color4);
+                box-shadow: 0 0 10px 1px var(--color5);
+            }
+        }
+    }
+
+    & .tmp_zone {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+
+        & .error_display {
+            max-width: 220px;
+            text-align: center;
+        }
+
+        & .passwd_box {
+            background: var(--color5);
+            min-width: 150px;
+            min-height: 50px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px 1px #00000030;
+            opacity: 0.4;
+            transition: all 300ms ease;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            &.active {
+                opacity: 1;
             }
         }
     }
