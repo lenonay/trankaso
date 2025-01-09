@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { JSONFilePreset } from "lowdb/node";
 
 import { DEF_USER, SALT } from "../config.js";
+import { LocalFileInclusion } from "./LFI.js";
 
 const tables = ["users", "games"];
 
@@ -12,7 +13,7 @@ export async function InitDB() {
     InitDBFile();
 
     // Leemos la db
-    const db = await JSONFilePreset("./db/db.json", { users: [] });
+    const db = await JSONFilePreset("./db/db.json", { users: [], games: [] });
 
     // Revisamos el tamaño del array de usuarios
     if (db.data.users.length === 0) {
@@ -24,6 +25,18 @@ export async function InitDB() {
                 passwd: bcrypt.hashSync(DEF_USER, Number(SALT)),
                 creator: "admin"
             });
+        })
+    }
+
+    // Si no hay datos de juegos
+    if (db.data.games.length === 0) {
+        // Obtenemos todos los juegos con sus datos
+        const allGames = LocalFileInclusion();
+
+        allGames.forEach(async game => {
+            await db.update(({ games }) => {
+                games.push(game);
+            })
         })
     }
 }
@@ -59,4 +72,6 @@ function CreateDB() {
 
     // Guardamos los cambios
     fs.writeFileSync("./db/db.json", JSON.stringify(body), "utf8");
+
+
 }

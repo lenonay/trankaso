@@ -1,4 +1,3 @@
-import fs from "node:fs"
 import { InitDB } from "./db/db.js";
 
 process.loadEnvFile("./.env");

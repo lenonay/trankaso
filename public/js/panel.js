@@ -38,11 +38,6 @@ function HandleUser() {
     main.innerHTML = "";
     main.classList.add("users");
 
-    LoadUsers();
-
-}
-
-function LoadUsers() {
     // Creamos los contenedores
     const menu = document.createElement("div");
     menu.className = "menu_div";
@@ -53,6 +48,23 @@ function LoadUsers() {
     main.append(menu);
     main.append(usuarios);
 
+    LoadUsersBtns();
+
+    LoadUsersData();
+}
+
+async function LoadUsersData() {
+    // Recuperamos el contenedor
+    const div = document.querySelector("main .usuarios_div");
+
+    const users_data = await GetAllUsers();
+
+    console.log(users_data);
+}
+
+function LoadUsersBtns() {
+    const menu = document.querySelector("main .menu_div");
+
     menu.innerHTML = `
         <button type="button" class="change_btn">
             <span>Cambiar contraseña</span>
@@ -62,12 +74,12 @@ function LoadUsers() {
         </button>
     `
 
+    // Recuperamos el boton para cambiar la contraseña y asignamos evento
     const change_btn = menu.querySelector(".change_btn");
-
     change_btn.addEventListener("click", ChangeOwnPass);
 
+    // Recuperamos el boton de crear usuario y asignamos el evento
     const create_btn = menu.querySelector(".create_btn");
-
     create_btn.addEventListener("click", CreateNewUser);
 }
 
@@ -95,7 +107,7 @@ function CreateNewUser() {
     create_btn.addEventListener("click", CheckNewUser);
 }
 
-function CheckNewUser(event) {
+function CheckNewUser() {
     // Recueramos el input
     const input = document.querySelector("#username");
 
@@ -146,7 +158,7 @@ function UpdateTmpPasswd(passwd) {
     span.classList.add("active");
 }
 
-function ChangeOwnPass(event) {
+function ChangeOwnPass() {
     // Creamos el display
     CreateDisplay("change_pass");
     const display = document.querySelector(".display.change_pass");
@@ -180,7 +192,7 @@ function ChangeOwnPass(event) {
     change_btn.addEventListener("click", CheckPasswd);
 }
 
-function CheckPasswd(event) {
+function CheckPasswd() {
     // Recuperamos todos los inputs
     const old_passwd = document.querySelector("#old_passwd");
     const new_passwd = document.querySelector("#new_passwd");
@@ -1040,4 +1052,5 @@ function CreateAlert() {
 }
 
 /////// Cuerpo
-HandleStorage();
+// HandleStorage();
+HandleUser();

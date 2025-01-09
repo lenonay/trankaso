@@ -29,7 +29,7 @@ export class FilesController {
 
         const CreateVideoThumbnail = () => {
             // Creamos el nombre normal
-            const filename = originalname.split(".").slice(0, -1).join("");
+            const filename = originalname.split(".").slice(0, -1).join(".");
 
             const file_pic = filename + ".png";
             const tmp_png_file = workdir + file_pic;
