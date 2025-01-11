@@ -91,4 +91,28 @@ export class UserController {
         }
 
     }
+
+    static async DeleteUser(req, res) {
+        const { user, creator } = req.session;
+        const { id } = req.body;
+
+        // Cargamos la base de datos
+        const db = await JSONFilePreset("./db/db.json", { users: [] });
+
+        // Obtenemos los datos del usuario de la DB
+        const userDB = db.data.users.find(entry => entry.id == id);
+
+        // Filtramos los permisos para borrar
+        if (!(userDB.creator == user) && !(creator == "admin")) {
+            res.json({ status: "error", error: "No tienes permiso para realizar esta acción" });
+            return;
+        }
+
+        // Borramos el usuario de la DB
+        await db.update(db => {
+            db.users = db.users.filter(entry => entry.id !== id);
+        });
+
+        res.send({ status: "OK" });
+    }
 }

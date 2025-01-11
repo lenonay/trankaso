@@ -59,7 +59,68 @@ async function LoadUsersData() {
 
     const users_data = await GetAllUsers();
 
-    console.log(users_data);
+    users_data.forEach(user => {
+        const card = document.createElement("div");
+        card.className = "user";
+
+        // Metemos el id
+        card.id = user.id;
+
+        // Contenido del div
+        card.innerHTML = `
+            <div class="data">
+                <span>${user.user}</span>
+                <p>Creador: <span>${user.creator}</span></p>
+            </div>
+            <button type="button" class="delete_btn">
+                ${svgs.trash()}
+            </button>
+        `;
+
+        div.append(card);
+
+        // Creamos el evento para que salga la alerta
+        const btn = card.querySelector(".delete_btn");
+        btn.addEventListener("click", DeleteUser);
+    });
+}
+
+async function DeleteUser(event) {
+    // Sacamos la ID
+    const id = event.currentTarget.closest("div").id;
+
+    // Creamos la alerta
+    CreateAlert();
+
+    // Recuperamos el boton
+    const confirm_btn = document.querySelector(".alert .confirm_btn");
+
+    // Evento para borrar
+    confirm_btn.addEventListener("click", async () => {
+        const peticion = await fetch(`${domain}/users`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id })
+        });
+
+        const resultado = (peticion.ok) ? await peticion.json() : null;
+
+        // Cerramos la alerta
+        CloseDisplay();
+
+        // Si hubo un error en el proceso
+        if (resultado.status !== "OK") {
+            // Enseñamos el error
+            CreateError(resultado.error);
+
+            return;
+        }
+
+        // Recargamos los usuarios
+        HandleUser();
+    });
 }
 
 function LoadUsersBtns() {
@@ -144,7 +205,7 @@ async function SendNewUser(username) {
     UpdateTmpPasswd(resultado.tmp_passwd);
 
     // Borramos el evento de crear un usuario
-    const create_btn = display.querySelector(".formulario .create_btn");
+    const create_btn = document.querySelector(".formulario .create_btn");
     create_btn.removeEventListener("click", CheckNewUser);
 }
 
@@ -974,6 +1035,8 @@ function ShowDisplayErrors(msg) {
     // Recuperamos el display de errores
     const error_display = document.querySelector(".error_display");
 
+    if (!error_display) return;
+
     // Mostramos el error
     error_display.innerHTML = `<p>${msg}</p>`;
 }
@@ -1048,6 +1111,45 @@ function CreateAlert() {
 
     const cancel_btn = alert.querySelector(".cancel_btn");
     cancel_btn.addEventListener("click", CloseDisplay);
+
+}
+
+function CreateError(error) {
+    // Creamos la alerta de error
+    const alert = document.createElement("div");
+    alert.className = "alert"
+    alert.classList.add("error");
+
+    // Creamos el fondo
+    const newBack = document.createElement("div");
+    newBack.className = "back";
+
+    alert.innerHTML = `
+        <h3>¡Error!</h3>
+        <p>
+            ${error}
+        </p>
+        <div class="buttons">
+            <button class="accept_btn" type="button">
+                <span>Aceptar</span>
+            </button>
+        </div>
+    `;
+
+    // Añadimos la alerta y el fondo
+    main.append(alert);
+    main.append(newBack);
+
+    // Funcion para borrar la alerta de error
+    const CloseError = () => {
+        alert.remove();
+        newBack.remove();
+    }
+
+    newBack.addEventListener("click", CloseError);
+
+    const accept_btn = alert.querySelector(".accept_btn");
+    accept_btn.addEventListener("click", CloseError);
 
 }
 

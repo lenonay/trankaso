@@ -9,3 +9,5 @@ UsersRouter.get("/", UserController.GetAllUsersData);
 UsersRouter.patch("/", UserController.ChangeOwnPasswd);
 
 UsersRouter.post("/", UserController.CreateNewUser);
+
+UsersRouter.delete("/", UserController.DeleteUser);
