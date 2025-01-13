@@ -598,9 +598,16 @@ function ShowFiles(_files) {
         const img = card.querySelector("img");
         const del_btn = card.querySelector(".delete_btn");
 
+        img.addEventListener("error", ThumbNotFound);
         img.addEventListener("click", ShowMedia);
         del_btn.addEventListener("click", DeleteFile);
     }
+}
+
+function ThumbNotFound(event) {
+    const { target } = event;
+
+    target.src = `${base_domain}public/broken-img-t.png`;
 }
 
 function ShowMedia(event) {
@@ -1154,5 +1161,4 @@ function CreateError(error) {
 }
 
 /////// Cuerpo
-// HandleStorage();
-HandleUser();
+HandleStorage();
