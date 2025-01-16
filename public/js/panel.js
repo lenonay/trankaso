@@ -4,6 +4,7 @@ const upload_btn = document.querySelector(".upload_btn");
 const storage_btn = document.querySelector(".storage_btn");
 const user_btn = document.querySelector(".user_btn");
 const logoff_btn = document.querySelector(".logoff_btn");
+const edent_btn = document.querySelector(".eden_btn");
 // Elementos
 const main = document.querySelector("main")
 const aside = document.querySelector("aside");
@@ -23,6 +24,7 @@ logoff_btn.addEventListener("click", Logoff);
 upload_btn.addEventListener("click", HandleUpload);
 storage_btn.addEventListener("click", HandleStorage);
 user_btn.addEventListener("click", HandleUser);
+edent_btn.addEventListener("click", HandleEden);
 
 ///// FUNCIONES
 async function Logoff() {
@@ -33,7 +35,22 @@ async function Logoff() {
     if (resultado.status == "OK") window.location.reload();
 }
 
+function HandleEden() {
+    MarkSelected(edent_btn);
+
+    // Vaciamos el main
+    main.innerHTML = "";
+    main.className = "eden";
+
+    main.innerHTML = `
+        <img src="./public/gato-obra.webp"></img>
+        <h3>Estoy trabajando en ello</h3>
+    `;
+}
+
 function HandleUser() {
+    MarkSelected(user_btn);
+
     // Vaciamos el contenido del main y le asignamos la clase correcta
     main.innerHTML = "";
     main.classList.add("users");
@@ -392,6 +409,8 @@ async function GetAllUsers() {
 }
 
 async function HandleStorage() {
+    MarkSelected(storage_btn);
+
     // Vaciamos el contenido del main
     main.innerHTML = "";
     main.className = "";
@@ -768,6 +787,7 @@ async function GetFilesFilters() {
 }
 
 async function HandleUpload() {
+    MarkSelected(upload_btn);
     // 1. Crear display y fondo y meterle la clase custom
     CreateDisplay("upload")
     // 2.1 Pedimos la lista de juegos al servidor
@@ -1158,6 +1178,18 @@ function CreateError(error) {
     const accept_btn = alert.querySelector(".accept_btn");
     accept_btn.addEventListener("click", CloseError);
 
+}
+
+function MarkSelected(boton) {
+    // Quitamos todos seleccionados
+    const all_selected = document.querySelectorAll(".selected");
+
+    all_selected.forEach(button => {
+        button.classList.remove("selected");
+    });
+
+    // Marcamos este como seleccionado
+    boton.classList.add("selected");
 }
 
 /////// Cuerpo

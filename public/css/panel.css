@@ -68,6 +68,14 @@ aside {
         color: #c6cdd3;
         transition: all 300ms ease;
 
+        &.selected {
+            color: var(--color4);
+
+            & svg {
+                filter: drop-shadow(0 0 3px var(--color5))
+            }
+        }
+
         &>svg {
             transition: all 300ms ease;
         }
@@ -382,6 +390,20 @@ main.users {
                 }
             }
         }
+    }
+}
+
+main.eden {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+
+    & img {
+        width: 250px;
+        aspect-ratio: 1;
+        box-shadow: 0 0 10px 1px #00000030;
+        border-radius: 30px;
     }
 }
 
