@@ -655,6 +655,9 @@ function ThumbNotFound(event) {
 }
 
 function ShowMedia(event) {
+    // Evitar que se carge cada que se cierre
+    UpdateSectionData({ reload: false });
+    
     // Recuperamos los datos del archivo
     const url = event.target.getAttribute("d_url");
     const type = event.target.getAttribute("d_type");
