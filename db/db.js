@@ -23,7 +23,8 @@ export async function InitDB() {
                 id: randomUUID(),
                 user: DEF_USER,
                 passwd: bcrypt.hashSync(DEF_USER, Number(SALT)),
-                creator: "admin"
+                creator: "admin",
+                priv: "ascendent"
             });
         })
     }
