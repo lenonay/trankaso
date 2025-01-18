@@ -737,7 +737,7 @@ function DeleteFileDisplay() {
 
         // Si hubo un error no recargamos la pagina
         if (respuesta.status !== "OK") {
-            UpdateSectionData({ section: "storage", filters: null, reload: false });
+            UpdateSectionData({ reload: false });
         }
 
         // Cerramos la alerta
@@ -751,6 +751,9 @@ function DeleteFileDisplay() {
 }
 
 function DeleteFile(event) {
+    // Activamos la recarga de contenido
+    UpdateSectionData({ reload: true });
+
     // Recuperamos la imagen
     const container = event.currentTarget.closest(".file_card");
     const img = container.querySelector("img");
@@ -782,16 +785,20 @@ function DeleteFile(event) {
 
         // Si hubo un error no recargamos la pagina
         if (respuesta.status !== "OK") {
-            UpdateSectionData({ section: "storage", filters: null, reload: false });
+            // Quitamos la recarga
+            UpdateSectionData({ reload: false });
+
+            // Cerramos la alerta
+            CloseDisplay();
+
+            // Mostramos el error
+            CreateError(respuesta.error);
+
+            return;
         }
 
         // Cerramos la alerta
         CloseDisplay();
-
-        // Mostramos el error si hay
-        if (respuesta.status !== "OK") {
-            CreateError(respuesta.error);
-        }
     });
 }
 
@@ -1132,12 +1139,9 @@ function CloseDisplay() {
     // Si existian los borramos
     if (oldBack) oldBack.remove();
     if (oldAlert) oldAlert.remove();
-    if (oldDisplay) {
-        ReloadSection();
+    if (oldDisplay) oldDisplay.remove();
 
-        // Y luego lo borramos.
-        oldDisplay.remove();
-    }
+    ReloadSection();
 }
 
 function CreateAlert() {
@@ -1247,11 +1251,9 @@ async function ReloadSection() {
                 // Mostramos los archivos.
                 ShowFiles(files);
 
-                // Salimos para no recargar todo el storage completo
-                break;
+            } else {
+                HandleStorage();
             }
-
-            HandleStorage();
 
             break;
         case section == "user":
@@ -1263,8 +1265,13 @@ async function ReloadSection() {
     }
 }
 
-function UpdateSectionData(data_) {
-    window.sessionStorage.setItem("section_data", JSON.stringify(data_));
+function UpdateSectionData(_data) {
+    // Recuperamos los datos actuales
+    const actual = JSON.parse(window.sessionStorage.getItem("section_data"));
+
+    const new_data = Object.assign({}, actual, _data)
+
+    window.sessionStorage.setItem("section_data", JSON.stringify(new_data));
 }
 
 /////// Cuerpo

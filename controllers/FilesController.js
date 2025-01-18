@@ -202,9 +202,11 @@ export class FilesController {
 
             // Enviamos estado existoso
             res.json({ status: "OK" });
-        } catch {
+        } catch (e) {
             // Si falla el borrado marcamos que no se pudo eliminar el archivo.
             res.json({ status: "error", error: "No se pudo eliminar el archivo" });
+        
+            console.log(e);
         }
     }
 }
