@@ -3,3 +3,4 @@ vault
 vault/
 .env
 db/db.json
+db/backup.json

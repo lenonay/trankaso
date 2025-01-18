@@ -42,6 +42,11 @@ export async function InitDB() {
     }
 }
 
+export function CreateBackup() {
+    // Copiamos el archivo
+    fs.copyFileSync("./db/db.json", "./db/backup.json");
+}
+
 function InitDBFile() {
     // Verificar si existe el archivo db
     if (!fs.existsSync("./db/db.json")) {
@@ -65,6 +70,25 @@ function InitDBFile() {
 }
 
 function CreateDB() {
+
+    // Intentamos cargar la copia de seguridad
+    if (fs.existsSync("./db/backup.json")) {
+        const backup = fs.readFileSync("./db/backup.json");
+
+        let valid = null;
+
+        // Intentamos parsear el backup
+        try {
+            valid = JSON.parse(backup);
+        } catch {}
+
+        // Si es válido, restauramos y salimos
+        if(valid){
+            fs.copyFileSync("./db/backup.json", "./db/db.json")
+            return;
+        }
+    }
+
     // Creamos el cuerpo vacio
     let body = {};
 
@@ -73,6 +97,4 @@ function CreateDB() {
 
     // Guardamos los cambios
     fs.writeFileSync("./db/db.json", JSON.stringify(body), "utf8");
-
-
 }

@@ -4,6 +4,7 @@ import { FilesRouter } from "./files.js";
 import { UsersRouter } from "./users.js";
 
 import { authorize } from "../middleware/authorize.js";
+import { backupDB } from "../middleware/backupDB.js";
 
 export const PanelRouter = Router();
 
@@ -20,6 +21,8 @@ PanelRouter.get("/", (req, res) => {
 
 // Evitar accesos sin sesion válida
 PanelRouter.use(authorize);
+
+PanelRouter.use(backupDB);
 
 PanelRouter.use("/games", GamesRouter);
 
