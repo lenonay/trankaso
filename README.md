@@ -97,11 +97,6 @@ Cuando una imagen es demasiado larga, por ejemplo una captura de pantalla de mov
 
 Seguramente la causa sea el CSS.
 
-#### Boton de eliminar en el display no funciona bien
-Cuando eliminas la imagen desde el display, sale el aviso. Cuando aceptas, se queda el div para cerrar los display pero no se actualiza bien la seccion.
-
-Debe ser un fallo al cambiar el sistema de recargar sección.
-
 ### Proximas utilidades
 Proximas features que vendrán a la aplicación
 
