@@ -123,6 +123,60 @@ export class GamesController {
         // 3 Devolver estado
         res.json({ status: "OK" });
     }
+
+    static async GetAllData(req, res) {
+        // Cargamos la longitud
+        const db = await JSONFilePreset('./db/db.json', { games: [] });
+
+        // Devolvemos los datos de los juegos pero con la cantidad de ficheros.
+        const new_Data = db.data.games.map((entry) => {
+            return { ...entry, files: entry.files.length }
+        });
+
+        // Devolvemos los datos
+        res.json(new_Data);
+    }
+
+    static async DeleteGame(req, res) {
+        // Recuperamos valores de la sesión y el cuerpo
+        const { creator } = req.session;
+        const { game } = req.body;
+        
+        // Si no eres admin no se pueden eliminar juegos
+        if(creator !== "admin") {
+            res.json({status: "error", error: "No tienes permiso para eliminar juegos"});
+            return;
+        }
+
+        // Cargamos la base de datos
+        const db = await JSONFilePreset("./db/db.json", { games: [] });
+
+        // Validamos si existe el juego
+        const gameDB = db.data.games.filter(entry => entry.name == game)[0];
+
+        // Si el juego no se encuentra, enviamos un error y salimos
+        if (!gameDB) {
+            res.json({ status: "error", error: "El juego no existe" });
+            return;
+        }
+
+        // Borramos fisicamente el directorio y colocar la base de datos
+        try {
+            // Borramos la carpeta del juego de forma recursiva
+            fs.rmSync(gameDB.path, { recursive: true });
+
+            // Sacamos el juego de la base de datos
+            await db.update(db => {
+                db.games = db.games.filter(entry => entry.name != game);
+            });
+
+            // Enviamos que todo está okey
+            res.json({ status: "OK" });
+        } catch {
+            // Si hubo un error, enviamos que no se pudo borrar el juego
+            res.json({ status: "error", error: "No se pudo eliminar el juego" });
+        }
+    }
 }
 
 function CreateTMPDir() {
