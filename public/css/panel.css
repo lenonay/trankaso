@@ -422,6 +422,8 @@ main.settings {
 
         & .games_container {
             width: 100%;
+            max-height: 100%;
+            overflow: auto;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -431,8 +433,6 @@ main.settings {
 
             & .game_card {
                 width: 100%;
-                max-height: 100%;
-                overflow: auto;
                 display: flex;
                 justify-content: space-between;
                 padding: 15px;
