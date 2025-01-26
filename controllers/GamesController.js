@@ -97,14 +97,15 @@ export class GamesController {
         }
 
         // 2 Modificar la sesion del usuario y meter la carpeta que quiere usar
+        delete req.session.iat;
+        delete req.session.exp;
 
         // Creamos la nueva sesion
         const updated_session = {
             workdir: path,
             thumbpath: thumbpath,
             gamename: name,
-            user: req.session.user,
-            id: req.session.id
+            ...req.session
         };
 
         // Creamos el nuevo JWT
@@ -141,7 +142,7 @@ export class GamesController {
         // Recuperamos valores de la sesión y el cuerpo
         const { creator } = req.session;
         const { game } = req.body;
-        
+
         // Si no eres admin no se pueden eliminar juegos
         if(creator !== "admin") {
             res.json({status: "error", error: "No tienes permiso para eliminar juegos"});
