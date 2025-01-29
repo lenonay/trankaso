@@ -1005,44 +1005,6 @@ function ShowFiles(_data) {
 
         files_div.append(div);
     });
-
-
-
-    // for (const file of _files.files) {
-    //     // Creamos el elemento
-    //     const card = document.createElement("div");
-    //     card.className = "file_card";
-
-    //     // Sacamos el tipo principal
-    //     const mainType = file.type.split("/")[0];
-
-    // card.innerHTML = `
-    //     <img 
-    //         d_type="${mainType}"
-    //         d_game="${file.game}"
-    //         d_date="${file.date}"
-    //         d_author="${file.author}"
-    //         d_url="${file.path}"
-    //         d_size="${file.size}"
-    //         src="${file.thumbnail}" 
-    //         alt="${file.name} thumbnail" 
-    //     />
-    //     <div class="buttons">
-    //         <button type="button" class="delete_btn">
-    //             ${svgs.trash()}
-    //         </button>
-    //     </div>
-    // `;
-
-    //     files_div.append(card);
-
-    //     const img = card.querySelector("img");
-    //     const del_btn = card.querySelector(".delete_btn");
-
-    //     img.addEventListener("error", ThumbNotFound);
-    //     img.addEventListener("click", ShowMedia);
-    //     del_btn.addEventListener("click", DeleteFile);
-    // }
 }
 
 function ThumbNotFound(event) {

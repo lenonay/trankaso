@@ -292,7 +292,7 @@ main {
                     border-radius: 8px;
                     cursor: pointer;
 
-                    &[type=video] {
+                    &[d_type=video] {
                         box-shadow: 0 0 5px 1px var(--color5);
                     }
                 }
