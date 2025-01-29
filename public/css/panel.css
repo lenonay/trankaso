@@ -485,6 +485,95 @@ main.settings {
     }
 }
 
+main.archive {
+    max-height: 100%;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 30px;
+
+    & .game {
+        width: 100%;
+        background: var(--color2);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 0 10px 1px #00000030;
+        transition: all 300ms ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 15px;
+
+        & h2 {
+            text-shadow: 0 0 5px var(--color5);
+        }
+    }
+
+    & .files_container {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 30px;
+
+        & .file {
+            padding: 15px;
+            background: var(--color1);
+            border-radius: 10px;
+            box-shadow: 0 0 8px 1px #00000030;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+
+            & img {
+                width: 150px;
+                aspect-ratio: 16/9;
+                object-fit: cover;
+                border-radius: 8px;
+
+                &[type=video] {
+                    box-shadow: 0 0 5px 1px var(--color5);
+                }
+            }
+
+            & .buttons {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+                gap: 8px;
+                height: 80px;
+
+
+                & button {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+
+                    & svg {
+                        transition: all 300ms ease;
+
+                        &:hover {
+                            color: var(--color4);
+                            filter: drop-shadow(0 0 5px var(--color5));
+                        }
+
+                    }
+
+                    &.delete_btn svg:hover {
+                        color: var(--alert1);
+                        filter: drop-shadow(0 0 5px var(--alert2));
+                    }
+                }
+            }
+        }
+    }
+}
+
 main.eden {
     display: flex;
     justify-content: flex-start;

@@ -2,6 +2,8 @@ import fs from "node:fs";
 import { JSONFilePreset } from "lowdb/node";
 import { execSync } from "node:child_process";
 
+import { Archives } from "../models/archive.js";
+
 export class FilesController {
     static async Upload(req, res) {
         // Si no hay archivo salimos
@@ -91,7 +93,8 @@ export class FilesController {
             size: (size / 1024 / 1024).toFixed(2),
             type: mimetype,
             author: user,
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
+            archived: false
         }
 
         // Intentamos guardar el fichero en la DB
@@ -128,7 +131,7 @@ export class FilesController {
 
         // Iteramos por cada juego y añadimos sus ficheros al array
         for (const game of db.data.games) {
-            files = files.concat(game.files);
+            files = files.concat(game.files).filter(entry => !entry.archived);
         }
 
         // Si hay juegos filtramos por ellos
@@ -155,12 +158,12 @@ export class FilesController {
 
             files = files.filter(entry => type_ar.includes(entry.type.split("/")[0]));
         }
-        
+
         // Filtramos por fecha formato YYYY-mm-dd
         if (date) {
             files = files.filter(entry => entry.date.includes(date));
         }
-        
+
         res.json({ n: files.length, files: files });
     }
 
@@ -169,7 +172,10 @@ export class FilesController {
 
         const users = db.data.users.map(entry => entry.user);
 
-        const games = db.data.games.map(entry => entry.name);
+        const games = db.data.games
+            .filter(entry => !entry.archived)
+            .map(entry => entry.name)
+            ;
 
         res.json({ users, games });
     }
@@ -184,7 +190,7 @@ export class FilesController {
         const gameDB = db.data.games.find(entry => entry.name == game);
 
         // Sacamos el fichero si el thumbnail incluye el nombre
-        const fileDB = gameDB.files.find(entry => entry.thumbnail.includes(name));
+        const fileDB = gameDB.files.find(entry => entry.thumbnail.includes(name) || entry.name == name);
 
         // Borramos tanto el archivo original como el thumbnail
         try {
@@ -205,8 +211,104 @@ export class FilesController {
         } catch (e) {
             // Si falla el borrado marcamos que no se pudo eliminar el archivo.
             res.json({ status: "error", error: "No se pudo eliminar el archivo" });
-        
+
             console.log(e);
         }
     }
+
+    static async ArchiveFile(req, res) {
+        // Sacamos el cuerpo
+        const { file, game } = req.body;
+
+        // Cargamos la db
+        const db = await JSONFilePreset('./db/db.json', { games: [] });
+
+        // Obtenemos los datos del fichero
+        const fileDB = GetFileFromDB(db, file, game);
+
+        // Si no existe el fichero mandamos error
+        if (!fileDB) {
+            res.json({ status: "error", error: "No existe el fichero" });
+            return;
+        }
+
+        // Lo intenantamos archivar
+        const archived = await Archives.file(fileDB);
+
+        // Si ocurre un error mientras se archiva, lo enviamos
+        if (archived.status !== "OK") {
+            res.json({ status: "error", error: "Fallo al comprimir el fichero" });
+            return;
+        }
+
+        // Cambiamos al ruta al archivo comprimido
+        fileDB.path = archived.new_path;
+        fileDB.archived = true;
+
+        await db.write();
+
+        res.json({ status: "OK" });
+    }
+
+    static async GetArchivedFiles(req, res) {
+        // Obtenemos la db
+        const db = await JSONFilePreset("./db/db.json", { games: [] });
+
+        const archived_games = db.data.games
+            // Mapeamos por cada juego
+            .map(game => ({
+                // Guardamos el nombre del juego
+                gameName: game.name,
+                // Archivos que tengan marcado como archivado
+                files: game.files.filter(file => file.archived)
+            }))
+            // Eliminamos los juegos que no tengan archivados
+            .filter(game => game.files.length > 0);
+        ;
+
+        res.send({ archived_games });
+    }
+
+    static async UnarchiveFile(req, res) {
+        const { name, game } = req.body;
+
+        // Cargamos la db
+        const db = await JSONFilePreset('./db/db.json', { games: [] });
+
+        // Obtenemos los datos del archivo
+        const fileDB = GetFileFromDB(db, name, game);
+
+        // Si no existe el fichero mandamos error
+        if (!fileDB) {
+            res.json({ status: "error", error: "No existe el fichero" });
+            return;
+        }
+
+        // Tratamos de desarchivar el fichero
+        const unarchived = await Archives.unarchive_file(fileDB);
+
+        if (unarchived.status !== "OK") {
+            res.json({ status: "error", error: unarchived.error });
+            return;
+        }
+
+        fileDB.path = unarchived.new_path;
+        fileDB.archived = false;
+
+        await db.write();
+
+        res.send({ status: "OK" });
+    }
+}
+
+function GetFileFromDB(db, name, game) {
+    // Filtramos primero por el juego en concreto, y luego por el nombre del fichero
+    return db.data.games
+        // Buscamos el juego
+        .find(entry => entry.name == game)
+        // Accedemos a sus archivos
+        .files
+        // Buscamos el nombre del archivo
+        .find(entry => entry.name == name)
+        ;
 }

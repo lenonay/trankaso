@@ -39,6 +39,12 @@ FilesRouter.delete("/", FilesController.DeleteSingle);
 
 FilesRouter.get("/filters", FilesController.SendFilesFilters);
 
+FilesRouter.get("/archive", FilesController.GetArchivedFiles);
+
+FilesRouter.post("/archive", FilesController.ArchiveFile)
+
+FilesRouter.delete("/archive", FilesController.UnarchiveFile);
+
 // Manejo de errores de multer
 FilesRouter.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {

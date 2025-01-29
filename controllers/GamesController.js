@@ -8,7 +8,9 @@ export class GamesController {
     static async GetNames(req, res) {
         const db = await JSONFilePreset("./db/db.json", { games: [] });
 
-        const game_names = db.data.games.map(entry => entry.name);
+        const aviable_games = db.data.games.filter(entry => !entry.archived);
+
+        const game_names = aviable_games.map(entry => entry.name);
 
         res.json({ game_names });
     }
@@ -42,6 +44,7 @@ export class GamesController {
         const new_game = {
             name: name,
             author: req.session.user,
+            archived: false,
             path: "./vault/" + name + "/",
             thumbpath: "./vault/" + name + "/.thumbnails/",
             files: []
@@ -60,7 +63,7 @@ export class GamesController {
         const db = await JSONFilePreset("./db/db.json", { games: [] });
 
         // 1 Obtener la ruta de la carpeta desde la DB
-        const gameDB = db.data.games.find(entry => entry.name == name);
+        const gameDB = db.data.games.find(entry => entry.name == name && !entry.archived);
 
         // Si no encuentra ninguno retorna error
         if (!gameDB) {

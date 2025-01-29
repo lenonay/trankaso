@@ -1,4 +1,4 @@
-import { InitDB } from "./db/db.js";
+import { InitDB, UpdateDB } from "./db/db.js";
 
 process.loadEnvFile("./.env");
 
@@ -18,3 +18,4 @@ export const allowed_ext = [
 ]
 
 InitDB();
+await UpdateDB();

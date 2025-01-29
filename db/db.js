@@ -47,6 +47,40 @@ export function CreateBackup() {
     fs.copyFileSync("./db/db.json", "./db/backup.json");
 }
 
+export async function UpdateDB() {
+    // Cargamos la db
+    const db = await JSONFilePreset("./db/db.json", { users: [], games: [] });
+
+    // Recuperamos las tablas
+    const users = db.data.users;
+    const games = db.data.games;
+
+    // Iteramos por cada usuario
+    users.forEach(user => {
+        // Verificamos si tiene el priv
+        if (!user.hasOwnProperty('priv')) {
+            user.priv = "normie";
+        }
+    });
+
+    games.forEach(game => {
+        // Si no tiene la propiedad archived se la añadimos a false
+        if(!game.hasOwnProperty('archived')){
+            game.archived = false;
+        }
+
+        // Iteramos por todos los ficheros de cada juego
+        game.files.forEach(file => {
+            if(!file.hasOwnProperty('archived')){
+                file.archived = false;
+            }
+        })
+    });
+
+    // Actualizamos la DB
+    db.write();
+}
+
 function InitDBFile() {
     // Verificar si existe el archivo db
     if (!fs.existsSync("./db/db.json")) {
@@ -80,10 +114,10 @@ function CreateDB() {
         // Intentamos parsear el backup
         try {
             valid = JSON.parse(backup);
-        } catch {}
+        } catch { }
 
         // Si es válido, restauramos y salimos
-        if(valid){
+        if (valid) {
             fs.copyFileSync("./db/backup.json", "./db/db.json")
             return;
         }

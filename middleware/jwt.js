@@ -33,7 +33,7 @@ export async function token(req, res, next) {
             req.session = null;
         }
     }
-
+ 
     next();
 }
 
