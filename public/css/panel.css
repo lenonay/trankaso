@@ -223,15 +223,14 @@ main {
 
     & .files {
         grid-area: files;
-        overflow: auto;
+
         max-height: 100%;
-        max-width: 100%;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        grid-auto-rows: 120px;
-        justify-items: center;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
         align-items: center;
-        gap: 20px 0;
+        gap: 30px;
 
         &.empty {
             display: flex;
@@ -251,54 +250,82 @@ main {
 
         }
 
-        & .file_card {
-            width: 200px;
-            height: 120px;
-            display: grid;
-            grid-template-columns: 1fr 40px;
-            justify-items: center;
-            align-items: center;
-            padding: 10px;
-            border-radius: 8px;
+        & .game {
+            width: 100%;
             background: var(--color2);
-            overflow: hidden;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px 1px #00000030;
+            transition: all 300ms ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 15px;
 
-            & img {
-                max-height: 100%;
-                object-fit: contain;
-                border-radius: 8px;
-                cursor: pointer;
-
-                &[d_type=video] {
-                    box-shadow: 0 0 10px 1px var(--color5);
-                }
+            & h2 {
+                text-shadow: 0 0 5px var(--color5);
             }
+        }
 
-            & .buttons {
+        & .files_container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+
+            & .file {
+                padding: 15px;
+                background: var(--color1);
+                border-radius: 10px;
+                box-shadow: 0 0 8px 1px #00000030;
                 display: flex;
-                flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                gap: 8px;
-                height: 100%;
-                width: 40px;
+                gap: 12px;
 
-                button {
-                    border: none;
-                    background: none;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    aspect-ratio: 1;
-                    transition: all 300ms ease;
-                    color: black;
-                    outline: none;
+                & img {
+                    width: 150px;
+                    aspect-ratio: 16/9;
+                    object-fit: cover;
+                    border-radius: 8px;
                     cursor: pointer;
 
-                    &:hover {
-                        color: var(--alert1);
-                        filter: drop-shadow(0 1px 2px var(--alert2));
+                    &[type=video] {
+                        box-shadow: 0 0 5px 1px var(--color5);
+                    }
+                }
+
+                & .buttons {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 8px;
+                    height: 80px;
+                    color: black;
+
+
+                    & button {
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+
+                        & svg {
+                            transition: all 300ms ease;
+
+                            &:hover {
+                                color: var(--color4);
+                                filter: drop-shadow(0 0 5px var(--color5));
+                            }
+
+                        }
+
+                        &.delete_btn svg:hover {
+                            color: var(--alert1);
+                            filter: drop-shadow(0 0 5px var(--alert2));
+                        }
                     }
                 }
             }

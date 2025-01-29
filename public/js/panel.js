@@ -922,15 +922,16 @@ function GetCheckboxFilters(grupo) {
     return names.join(";");
 }
 
-function ShowFiles(_files) {
+function ShowFiles(_data) {
     // Recuperamos el contenido
-    const files_div = document.querySelector(".files");
+    const files_div = document.querySelector("main .files");
+
     // Restablecemos el div
     files_div.innerHTML = "";
     files_div.className = "files";
 
     // Si no hay archivos
-    if (_files.files.length == 0) {
+    if (_data.length == 0) {
         files_div.classList.add("empty")
 
         files_div.innerHTML = `
@@ -939,41 +940,109 @@ function ShowFiles(_files) {
         `;
     }
 
-    for (const file of _files.files) {
-        // Creamos el elemento
-        const card = document.createElement("div");
-        card.className = "file_card";
+    _data.forEach(game => {
+        // Creamos el contenedor
+        const div = document.createElement("div");
+        div.className = "game";
 
-        // Sacamos el tipo principal
-        const mainType = file.type.split("/")[0];
+        // Asignamos el nombre del juego como id
+        div.id = game.gameName;
 
-        card.innerHTML = `
-            <img 
-                d_type="${mainType}"
-                d_game="${file.game}"
-                d_date="${file.date}"
-                d_author="${file.author}"
-                d_url="${file.path}"
-                d_size="${file.size}"
-                src="${file.thumbnail}" 
-                alt="${file.name} thumbnail" 
-            />
-            <div class="buttons">
-                <button type="button" class="delete_btn">
-                    ${svgs.trash()}
-                </button>
-            </div>
-        `;
+        // Ponemos el titulo del juego
+        div.innerHTML = `<h2>${game.gameName}</h2>`;
 
-        files_div.append(card);
+        // Recuperamos el contenedor
+        const files_container = document.createElement("div");
+        files_container.className = "files_container";
 
-        const img = card.querySelector("img");
-        const del_btn = card.querySelector(".delete_btn");
+        // Añadimos el contenedor
+        div.append(files_container);
 
-        img.addEventListener("error", ThumbNotFound);
-        img.addEventListener("click", ShowMedia);
-        del_btn.addEventListener("click", DeleteFile);
-    }
+        // Iteramos por cada juego
+        game.files.forEach(file => {
+            // Creamos una tarjeta
+            const card = document.createElement("div");
+            card.className = "file";
+
+            // Recuperamos el tipo
+            const mainType = file.type.split("/")[0];
+
+            // Especificamos los atributos
+            card.setAttribute("d_game", file.game);
+            card.setAttribute("d_name", file.name);
+
+            card.innerHTML = `
+                <img 
+                    d_type="${mainType}"
+                    d_game="${file.game}"
+                    d_date="${file.date}"
+                    d_author="${file.author}"
+                    d_url="${file.path}"
+                    d_size="${file.size}"
+                    src="${file.thumbnail}" 
+                    alt="${file.name} thumbnail" 
+                />
+                <div class="buttons">
+                    <button type="button" class="delete_btn">
+                        ${svgs.trash()}
+                    </button>
+                </div>
+            `;
+
+            // Añadimos el elemento
+            files_container.append(card);
+
+            // Recuperamos los eventos
+            const img = card.querySelector("img");
+            const del_btn = card.querySelector(".delete_btn");
+
+            // Eventos
+            img.addEventListener("error", ThumbNotFound);
+            img.addEventListener("click", ShowMedia);
+            del_btn.addEventListener("click", DeleteFile);
+
+        });
+
+        files_div.append(div);
+    });
+
+
+
+    // for (const file of _files.files) {
+    //     // Creamos el elemento
+    //     const card = document.createElement("div");
+    //     card.className = "file_card";
+
+    //     // Sacamos el tipo principal
+    //     const mainType = file.type.split("/")[0];
+
+    // card.innerHTML = `
+    //     <img 
+    //         d_type="${mainType}"
+    //         d_game="${file.game}"
+    //         d_date="${file.date}"
+    //         d_author="${file.author}"
+    //         d_url="${file.path}"
+    //         d_size="${file.size}"
+    //         src="${file.thumbnail}" 
+    //         alt="${file.name} thumbnail" 
+    //     />
+    //     <div class="buttons">
+    //         <button type="button" class="delete_btn">
+    //             ${svgs.trash()}
+    //         </button>
+    //     </div>
+    // `;
+
+    //     files_div.append(card);
+
+    //     const img = card.querySelector("img");
+    //     const del_btn = card.querySelector(".delete_btn");
+
+    //     img.addEventListener("error", ThumbNotFound);
+    //     img.addEventListener("click", ShowMedia);
+    //     del_btn.addEventListener("click", DeleteFile);
+    // }
 }
 
 function ThumbNotFound(event) {
@@ -1163,7 +1232,7 @@ function DeleteFile(event) {
     UpdateSectionData({ reload: true });
 
     // Recuperamos la imagen
-    const container = event.currentTarget.closest(".file_card");
+    const container = event.currentTarget.closest(".file");
     const img = container.querySelector("img");
 
     // Sacamos el nombre

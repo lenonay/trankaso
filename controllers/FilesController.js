@@ -126,45 +126,27 @@ export class FilesController {
         // Sacamos los filtros
         const { games, author, date, type } = req.query;
 
-        // Inicalizamos el array de ficheros
-        let files = [];
+        const result = db.data.games
+        // 1. Filtrar juegos por nombre si existe el parámetro
+        .filter(game => !games || games.split(";").includes(game.name))
+        
+        // 2. Mapear estructura y aplicar filtros a archivos
+        .map(game => ({
+            gameName: game.name,
+            files: game.files
+                // Archivos no archivados
+                .filter(file => !file.archived)
+                // Aplicar resto de filtros
+                .filter(file => {
+                    return (!author || author.split(";").includes(file.author)) &&
+                           (!type || type.split(";").includes(file.type.split("/")[0])) &&
+                           (!date || file.date.includes(date));
+                })
+        }))
+        // 3. Eliminar juegos sin archivos
+        .filter(game => game.files.length > 0);
 
-        // Iteramos por cada juego y añadimos sus ficheros al array
-        for (const game of db.data.games) {
-            files = files.concat(game.files).filter(entry => !entry.archived);
-        }
-
-        // Si hay juegos filtramos por ellos
-        if (games) {
-            // Separamos los juegos haciendo un array
-            let games_ar = games.split(";");
-
-            // Filtramos
-            files = files.filter(entry => games_ar.includes(entry.game));
-        }
-
-        // Filtramos por autor
-        if (author) {
-            // Sacamos el array
-            let author_ar = author.split(";");
-
-            // Filtramos si contiene el nombre
-            files = files.filter(entry => author_ar.includes(entry.author));
-        }
-
-        // Filtramos por tipo de medio
-        if (type) {
-            let type_ar = type.split(";");
-
-            files = files.filter(entry => type_ar.includes(entry.type.split("/")[0]));
-        }
-
-        // Filtramos por fecha formato YYYY-mm-dd
-        if (date) {
-            files = files.filter(entry => entry.date.includes(date));
-        }
-
-        res.json({ n: files.length, files: files });
+        res.json(result);
     }
 
     static async SendFilesFilters(req, res) {
