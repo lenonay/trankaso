@@ -133,6 +133,7 @@ export class FilesController {
         // 2. Mapear estructura y aplicar filtros a archivos
         .map(game => ({
             gameName: game.name,
+            archived: game.archived,
             files: game.files
                 // Archivos no archivados
                 .filter(file => !file.archived)
@@ -143,8 +144,8 @@ export class FilesController {
                            (!date || file.date.includes(date));
                 })
         }))
-        // 3. Eliminar juegos sin archivos
-        .filter(game => game.files.length > 0);
+        // 3. Eliminar juegos sin archivos y los que están archivados
+        .filter(game => game.files.length > 0 && !game.archived);
 
         res.json(result);
     }
@@ -215,7 +216,7 @@ export class FilesController {
         }
 
         // Lo intenantamos archivar
-        const archived = await Archives.file(fileDB);
+        const archived = Archives.file(fileDB);
 
         // Si ocurre un error mientras se archiva, lo enviamos
         if (archived.status !== "OK") {
@@ -241,11 +242,14 @@ export class FilesController {
             .map(game => ({
                 // Guardamos el nombre del juego
                 gameName: game.name,
+                // Guardamos si está archivado
+                archived: game.archived, 
+
                 // Archivos que tengan marcado como archivado
                 files: game.files.filter(file => file.archived)
             }))
             // Eliminamos los juegos que no tengan archivados
-            .filter(game => game.files.length > 0);
+            .filter(game => game.files.length > 0 && !game.archived);
         ;
 
         res.send({ archived_games });
@@ -267,7 +271,7 @@ export class FilesController {
         }
 
         // Tratamos de desarchivar el fichero
-        const unarchived = await Archives.unarchive_file(fileDB);
+        const unarchived = Archives.unarchive_file(fileDB);
 
         if (unarchived.status !== "OK") {
             res.json({ status: "error", error: unarchived.error });

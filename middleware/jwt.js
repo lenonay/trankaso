@@ -17,7 +17,7 @@ export async function token(req, res, next) {
             const existe = ValidateUser(data.user);
 
             // Si no existe el usuario en la DB le quitamos el acceso
-            if(!existe){
+            if (!existe) {
                 // Borramos la cookie
                 res.clearCookie("token");
                 // Sacamos la sesión
@@ -33,7 +33,7 @@ export async function token(req, res, next) {
             req.session = null;
         }
     }
- 
+
     next();
 }
 
@@ -45,9 +45,9 @@ async function ValidateUser(user) {
     const existe = db.data.users.filter(entry => entry.user !== user);
 
     // Retornamos verdadero o falso
-    if(existe){
+    if (existe) {
         return true;
-    }else {
+    } else {
         return false;
     }
 }

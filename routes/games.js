@@ -13,3 +13,5 @@ GamesRouter.post("/", GamesController.CreateGame);
 GamesRouter.put("/", GamesController.UseGame);
 
 GamesRouter.delete("/", GamesController.DeleteGame);
+
+GamesRouter.put("/archive", GamesController.ToggleArchive);

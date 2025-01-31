@@ -3,6 +3,9 @@ import jwt from "jsonwebtoken";
 import { JSONFilePreset } from "lowdb/node";
 
 import { JWT_PASS, TMP_DIR } from "../config.js"
+import { Archives } from "../models/archive.js";
+import { getFormatedSize } from "../models/formatedSize.js";
+
 
 export class GamesController {
     static async GetNames(req, res) {
@@ -102,6 +105,9 @@ export class GamesController {
         // 2 Modificar la sesion del usuario y meter la carpeta que quiere usar
         delete req.session.iat;
         delete req.session.exp;
+        delete req.session.workdir;
+        delete req.session.thumbpath;
+        delete req.session.gamename;
 
         // Creamos la nueva sesion
         const updated_session = {
@@ -137,6 +143,10 @@ export class GamesController {
             return { ...entry, files: entry.files.length }
         });
 
+        for(const game of new_Data){
+            game.size = getFormatedSize(game.path);
+        }
+
         // Devolvemos los datos
         res.json(new_Data);
     }
@@ -147,8 +157,8 @@ export class GamesController {
         const { game } = req.body;
 
         // Si no eres admin no se pueden eliminar juegos
-        if(creator !== "admin") {
-            res.json({status: "error", error: "No tienes permiso para eliminar juegos"});
+        if (creator !== "admin") {
+            res.json({ status: "error", error: "No tienes permiso para eliminar juegos" });
             return;
         }
 
@@ -180,6 +190,43 @@ export class GamesController {
             // Si hubo un error, enviamos que no se pudo borrar el juego
             res.json({ status: "error", error: "No se pudo eliminar el juego" });
         }
+    }
+
+    static async ToggleArchive(req, res) {
+        // Recuperamos el nombre del juego
+        const { gameName } = req.body;
+
+        // Leemos la db
+        const db = await JSONFilePreset('./db/db.json', { games: [] });
+
+        // Buscamos el el juego
+        const gameDB = db.data.games.find(entry => entry.name == gameName);
+
+        if (!gameDB) {
+            res.json({ status: "error", error: "No existe el juego" });
+            return;
+        }
+
+        // Si está archivado
+        const resultado = (gameDB.archived)
+            ? Archives.unarchive_game(gameDB)
+            : Archives.archive_game(gameDB)
+            ;
+
+        // Si hubo un error informamos
+        if (resultado.status != "OK") {
+            res.json({ status: "error", error: resultado.error });
+            return;
+        }
+
+        // Cambiamos los valores en la DB
+        gameDB.path = resultado.new_path;
+        gameDB.archived = resultado.archived;
+
+        // Escribimos en la DB
+        await db.write();
+
+        res.json({ status: "OK" });
     }
 }
 
