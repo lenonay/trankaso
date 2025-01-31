@@ -1639,11 +1639,15 @@ function CreateDisplay(customClass) {
 function CloseDisplay() {
     // Recuperamos los antiguos si existían
     const oldDisplay = document.querySelector(".display");
-    const oldBack = document.querySelector(".back");
+    const oldBacks = document.querySelectorAll(".back");
     const oldAlert = document.querySelector(".alert");
 
     // Si existian los borramos
-    if (oldBack) oldBack.remove();
+    if (oldBacks) {
+        for (const back of oldBacks) {
+            back.remove();
+        }
+    };
     if (oldAlert) oldAlert.remove();
     if (oldDisplay) oldDisplay.remove();
 
