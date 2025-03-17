@@ -822,7 +822,7 @@ async function HandleStorage() {
     MarkSelected(storage_btn);
 
     // Actualizamos los datos de seccion
-    UpdateSectionData({ section: "storage", filters: null, reload: true });
+    UpdateSectionData({ section: "storage", filters: null, reload: false });
 
     // Vaciamos el contenido del main
     main.innerHTML = "";

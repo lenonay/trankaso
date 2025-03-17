@@ -83,7 +83,15 @@ En esta sección podremos cambiar la contraseña de nuestro usuario y crear usua
 Cualquiera puede crear un usuario nuevo, se introduce el nombre del nuevo usuario y se crea una contraseña temporal. Cuando un usuario es creado registra quién lo creó, esto es debido a que los usuarios que no son administradores, solo pueden eliminar los usuarios que ellos hayan creado. Por otro lado, el administrador puede eliminar cualquier usuario
 
 ### Opciones
-Sección en proceso, aqui se podrá gestionar los juegos que hayan, revisar el almacenamiento consumido, entre otros.
+Sección en proceso, aqui se podrá gestionar los juegos que hayan, revisar el almacenamiento consumido, entre otros. Actualmente se pueden listar los juegos, ver la cantidad de ficheros subidos, y el peso total. Además se puede realizar dos acciones.
+
+#### Archivar / Bloquear
+Permite que un juego se quede archivado y ya no aparezca en ningún lado, es decir ocultarlo. La utilidad de esto es que si ya determinado juego ya no se va a usar más estorba en la selcción de filtros. Por tanto se puede quitar de las listas sin perder el contenido que se haya subido.
+
+Además cuando un juego se archiva todo su contenido se comprime mediante *bzip2* para reducir el peso y que forme un solo archivo. Si un juego ya está archivado, se cambia la opción por archiva / desbloquear. Que realiza el trabajo inverso.
+
+#### Eliminar
+Se puede borrar un juego completo en su totalidad, sin dejar rastro de ficheros en el servidor. Está capacidad, está limitada exclusivamente a administradores.
 
 
 ## Desarollo
@@ -97,13 +105,12 @@ Cuando una imagen es demasiado larga, por ejemplo una captura de pantalla de mov
 
 Seguramente la causa sea el CSS.
 
+**Solución Prevista**: En principio no habrá una solución o al menos no es critico, puesto que al tratarse de clips de video juegos, el resolución es 16:9 y no se dará el caso sino de forma artificial.
+
 ### Proximas utilidades
 Proximas features que vendrán a la aplicación
 
-#### Menú de ajustes - Prio Alta
-Se necesita un menu de ajustes donde se pueda ver los juegos creados, poder borrarlos solo si se tiene privilegio de admin. Y poder ver el peso en el directorio vault.
+Sería importante que el servidor de forma autónoma fuese realizando copias incrementales del estado de los clips o en su defecto una copia completa que se actualice constantemente.
 
-Seguramente haga que se use alguna dependecia o manejar la salida del comando `du -h -d 1 ./vault`
-
-#### Función de archivado - Prio Baja
-Sería ideal poder archivar clips o juegos completos, sobretodo para los que estén muy vistos y se ideal guardarlos.
+#### CSS Responsive
+Sería interesante en la medida de la posible ajustar los estilos para que se adapten a pantallas pequeñas, no necesariamente móviles puesto que todo quedará muy apretado, sino por ejemplo pantalla dividida en en PC.
