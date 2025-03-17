@@ -1652,8 +1652,10 @@ function CloseDisplay() {
     if (oldDisplay) oldDisplay.remove();
 
     ReloadSection();
-    // Volvemos a poner que se recargue
-    UpdateSectionData({ reload: true });
+
+    ///// FIX Esto causa que se recargue de forma innecesaria cuando no se han aplicado filtros, si es necesario para algo queda comentado
+    // // Volvemos a poner que se recargue
+    // UpdateSectionData({ reload: true });
 }
 
 function CreateAlert(aviso) {
