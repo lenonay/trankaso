@@ -1,4 +1,6 @@
 import fs from "node:fs";
+import path from "node:path";
+
 import { JSONFilePreset } from "lowdb/node";
 import { execSync } from "node:child_process";
 
@@ -15,14 +17,14 @@ export class FilesController {
         const db = await JSONFilePreset("./db/db.json", { games: [] });
 
         // Sacamos todas las variables necesarias
-        const { path, mimetype, size, originalname } = req.file;
+        const { path: filePath, mimetype, size, originalname } = req.file;
         const { workdir, thumbpath, gamename, user } = req.session
 
         const CreateImageThumbnail = () => {
 
-            const thumbnail_path = thumbpath + originalname;
+            const thumbnail_path = path.join(thumbpath, originalname);
 
-            const comando = `convert -thumbnail 150 '${path}' '${thumbnail_path}'`
+            const comando = `convert -thumbnail 150 '${filePath}' '${thumbnail_path}'`
             // Ejecutamos el comando
             execSync(comando);
 
@@ -34,11 +36,11 @@ export class FilesController {
             const filename = originalname.split(".").slice(0, -1).join(".");
 
             const file_pic = filename + ".png";
-            const tmp_png_file = workdir + file_pic;
-            const thumbnail_path = thumbpath + file_pic;
+            const tmp_png_file = path.join(workdir, file_pic);
+            const thumbnail_path = path.join(thumbpath, file_pic);
 
             // Crear la miniatura
-            const miniatura_commando = `ffmpeg -loglevel quiet -i '${path}' -frames:v 1 '${tmp_png_file}'`;
+            const miniatura_commando = `ffmpeg -loglevel quiet -i '${filePath}' -frames:v 1 '${tmp_png_file}'`;
             try {
                 execSync(miniatura_commando);
             } catch { };
@@ -81,14 +83,16 @@ export class FilesController {
 
         // 2. Mover el fichero a su destino
         try {
-            fs.renameSync(path, workdir + originalname);
+            const newPath = path.join(workdir, originalname)
+
+            fs.renameSync(filePath, newPath);
         } catch { }
 
         // 3. Crear el objeto para la DB y meterlo
         const new_file = {
             name: originalname,
             game: gamename,
-            path: workdir + originalname,
+            path: path.join(workdir, originalname),
             thumbnail: thumbnail_path,
             size: (size / 1024 / 1024).toFixed(2),
             type: mimetype,
@@ -113,7 +117,7 @@ export class FilesController {
             try {
                 fs.unlinkSync(thumbnail_path);
 
-                fs.unlinkSync(workdir + originalname);
+                fs.unlinkSync(path.join(workdir, originalname));
             } catch { }
 
             res.json({ status: "error", error: "No se pudo guardar la imagen" });
